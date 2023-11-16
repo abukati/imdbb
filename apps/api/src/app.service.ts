@@ -1,17 +1,22 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import {
   IApiResponse,
   IMovieProfile,
   ISearchedMovie,
-  OmdbResponse,
+  IUppercasedJson,
 } from 'types';
+import { lowercaseJsonKeys } from './utils/lowercaseJson';
 
 @Injectable()
 export class AppService {
+  private readonly logger = new Logger(AppService.name);
+
   async searchMovies(query?: string): Promise<IApiResponse<ISearchedMovie[]>> {
     if (query === undefined) {
       throw new BadRequestException();
@@ -20,22 +25,25 @@ export class AppService {
       const response = await fetch(
         `https://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&s=${query}`,
       );
-      const { Response, Search } = (await response.json()) as OmdbResponse;
+      const json = (await response.json()) as IUppercasedJson;
+      const { response: apiResponse, search: movies } = lowercaseJsonKeys(json);
 
-      const isResponseOk = JSON.parse(Response.toLowerCase());
+      const isResponseOk =
+        typeof apiResponse === 'boolean'
+          ? apiResponse
+          : JSON.parse(apiResponse.toLowerCase());
       if (!isResponseOk) {
         throw new NotFoundException();
       }
 
-      const movies = Search;
-      if (movies.length > 0) {
+      if (movies.length > 0 && (movies satisfies ISearchedMovie[])) {
         return {
           status: 200,
           data: movies,
         };
       }
 
-      throw new NotFoundException();
+      throw new InternalServerErrorException();
     } catch (error) {
       return {
         status: error.status,
@@ -49,17 +57,25 @@ export class AppService {
       const response = await fetch(
         `https://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&i=${id}`,
       );
-      const { Response, ...movie } = (await response.json()) as IMovieProfile;
+      const json = (await response.json()) as IUppercasedJson;
+      const { response: apiResponse, ...movie } = lowercaseJsonKeys(json);
 
-      const isResponseOk = JSON.parse(Response.toLowerCase());
+      const isResponseOk =
+        typeof apiResponse === 'boolean'
+          ? apiResponse
+          : JSON.parse(apiResponse.toLowerCase());
       if (!isResponseOk) {
         throw new NotFoundException();
       }
 
-      return {
-        status: 200,
-        data: movie,
-      };
+      if (validateMovieProfile(movie)) {
+        return {
+          status: 200,
+          data: movie as IMovieProfile,
+        };
+      }
+
+      throw new InternalServerErrorException();
     } catch (error) {
       return {
         status: error.status,
@@ -67,4 +83,12 @@ export class AppService {
       };
     }
   }
+}
+
+function validateMovieProfile(obj: any): boolean {
+  return typeof obj === 'object' &&
+    obj !== null &&
+    (obj satisfies IMovieProfile)
+    ? true
+    : false;
 }
