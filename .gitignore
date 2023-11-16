@@ -14,7 +14,7 @@ out/
 build
 
 # nest.js
-dist
+dist/
 
 # misc
 .DS_Store

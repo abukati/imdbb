@@ -10,10 +10,10 @@ export default function Header({
 }: {
   searchMovies: (query: string) => Promise<ISearchedMovie[] | undefined>;
 }): JSX.Element {
-  const [_, setContext] = useMoviesContext();
+  const [{ status }, setContext] = useMoviesContext();
 
   const handleMovieSearch = async (query: string) => {
-    // if (query.length < 3) return;
+    if (status === 'pending') return;
     setContext(p => ({ ...p, status: 'pending', error: undefined }));
     const movies = await searchMovies(query);
     if (movies === undefined || movies.length < 1) {

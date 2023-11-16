@@ -1,5 +1,18 @@
 import { getMovie } from '^/app/services/api.service';
 
+function SplittedStringsList({ string, title }: { string: string; title: string }) {
+  return (
+    <div>
+      <h3 className="text-xl font-bold mb-2">{title}</h3>
+      <ul className="list-disc pl-4">
+        {string.split(', ').map(item => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export default async function MoviePage({ params }: { params: { movieId: string } }) {
   const movie = await getMovie(params.movieId);
 
@@ -43,30 +56,9 @@ export default async function MoviePage({ params }: { params: { movieId: string 
           </div>
 
           <div className="flex justify-between">
-            <div>
-              <h3 className="text-xl font-bold mb-2">Cast</h3>
-              <ul className="list-disc pl-4">
-                {movie.actors.split(', ').map(actor => (
-                  <li key={actor}>{actor}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-xl font-bold mb-2">Directed By</h3>
-              <ul className="list-disc pl-4">
-                {movie.director.split(', ').map(director => (
-                  <li key={director}>{director}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-xl font-bold mb-2">Written By</h3>
-              <ul className="list-disc pl-4">
-                {movie.writer.split(', ').map(writer => (
-                  <li key={writer}>{writer}</li>
-                ))}
-              </ul>
-            </div>
+            <SplittedStringsList string={movie.actors} title="Cast" />
+            <SplittedStringsList string={movie.director} title="Directed By" />
+            <SplittedStringsList string={movie.writer} title="Written By" />
           </div>
         </div>
       </div>

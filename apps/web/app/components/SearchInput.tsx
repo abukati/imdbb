@@ -10,15 +10,15 @@ export default function SearchInput({ handleMovieSearch }: { handleMovieSearch: 
 
   const debounceSearch = debounce(term => {
     handleMovieSearch(term);
-  }, 300);
+  }, 400);
 
   const handleChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
     const term = target.value;
     setQuery(term);
     validateInput(term);
-    // if (term.length < minQueryLength) {
-    //   return;
-    // }
+    if (term.length < minQueryLength) {
+      return;
+    }
     debounceSearch(term);
   };
 
@@ -46,7 +46,7 @@ export default function SearchInput({ handleMovieSearch }: { handleMovieSearch: 
     <>
       <input
         ref={inputRef}
-        className="text-black"
+        className="text-black py-2 px-4 border border-gray-300 rounded-l-md focus:outline-none focus:ring focus:border-blue-500"
         type="text"
         placeholder="Search for your movie..."
         value={query}
@@ -54,7 +54,11 @@ export default function SearchInput({ handleMovieSearch }: { handleMovieSearch: 
         onChange={handleChange}
       />
       <div className="tooltip">Search term length must must not be less than {minQueryLength} characters!</div>
-      <button type="button" onClick={() => handleMovieSearch(query)}>
+      <button
+        className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded-r-md focus:outline-none focus:ring focus:border-blue-50"
+        type="button"
+        onClick={() => handleMovieSearch(query)}
+      >
         Search
       </button>
     </>

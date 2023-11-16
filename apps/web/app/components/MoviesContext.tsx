@@ -1,21 +1,12 @@
 'use client';
 
-import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useState } from 'react';
-import { ISearchedMovie } from 'types';
+import { Dispatch, SetStateAction, createContext, useContext, useState } from 'react';
+import { IMoviesContext, MoviesProviderProps } from '^/types/movies_context';
 
-interface MoviesContext {
-  searchTerm?: '';
-  movies?: ISearchedMovie[];
-  status?: 'idle' | 'pending';
-  error?: string;
-}
-export const MoviesContext = createContext<[MoviesContext, Dispatch<SetStateAction<MoviesContext>>]>([{}, () => {}]);
+export const MoviesContext = createContext<[IMoviesContext, Dispatch<SetStateAction<IMoviesContext>>]>([{}, () => {}]);
 
-export default function MoviesProvider({ children }: { children: ReactNode }) {
-  const [context, setContext] = useState<MoviesContext>({
-    movies: [],
-    status: 'idle'
-  });
+export default function MoviesProvider({ children, initialValue }: MoviesProviderProps) {
+  const [context, setContext] = useState<IMoviesContext>(initialValue);
   return <MoviesContext.Provider value={[context, setContext]}>{children}</MoviesContext.Provider>;
 }
 
