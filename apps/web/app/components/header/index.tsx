@@ -16,7 +16,6 @@ export default function Header({
   const handleMovieSearch = async () => {
     setContext(p => ({ ...p, status: 'pending', error: undefined }));
     const movies = await searchMovies(query);
-    console.log(movies);
     if (movies === undefined || movies.length < 1) {
       setContext(p => ({ ...p, error: `Could not find movies named ${query}`, status: 'idle' }));
     }
