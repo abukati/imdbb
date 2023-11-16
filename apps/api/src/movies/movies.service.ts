@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import {
@@ -11,7 +10,8 @@ import {
   ISearchedMovie,
   IUppercasedJson,
 } from 'types';
-import { lowercaseJsonKeys } from '../../utils/lowercaseJson';
+import { lowercaseJsonKeys } from '^/utils/lowercaseJson';
+import { validateObject } from '^/utils/validateObj';
 
 @Injectable()
 export class MoviesService {
@@ -39,7 +39,8 @@ export class MoviesService {
     }
     try {
       const { search: movies } = await this.fetchOmdb(`&s=${query}`);
-      if (movies.length > 0 && validateMovieProfile<ISearchedMovie[]>(movies)) {
+
+      if (movies.length > 0 && validateObject<ISearchedMovie[]>(movies)) {
         return {
           status: 200,
           data: movies as ISearchedMovie[],
@@ -59,7 +60,7 @@ export class MoviesService {
     try {
       const movie = await this.fetchOmdb(`&i=${id}`);
 
-      if (validateMovieProfile<IMovieProfile>(movie)) {
+      if (validateObject<IMovieProfile>(movie)) {
         return {
           status: 200,
           data: movie as IMovieProfile,
@@ -74,10 +75,4 @@ export class MoviesService {
       };
     }
   }
-}
-
-function validateMovieProfile<T>(obj: any): boolean {
-  return typeof obj === 'object' && obj !== null && (obj satisfies T)
-    ? true
-    : false;
 }

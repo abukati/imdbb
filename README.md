@@ -14,8 +14,9 @@ Once all of the dependencies have been installed, get your API key from [omdbapi
 Then, store it under the OMDB_API_KEY environment variable as well as the API url under OMDB_API_URL.
 
 Then you can run:
+
 ```sh
-npx turbo dev
+npm start
 ```
 
 ## What's inside?
