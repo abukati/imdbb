@@ -2,6 +2,9 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Header from './components/header';
+import ContextWrapper from './components/MoviesContext';
+import { ISearchedMovie } from 'types';
+import { searchMovies } from './services/api.service';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -11,11 +14,21 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }): JSX.Element {
+  async function fetchMovies(query: string): Promise<ISearchedMovie[] | undefined> {
+    'use server';
+    const movies = await searchMovies(query);
+    if (movies !== null) {
+      return movies;
+    }
+  }
+
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header />
-        <main>{children}</main>
+        <ContextWrapper>
+          <Header searchMovies={fetchMovies} />
+          <main>{children}</main>
+        </ContextWrapper>
       </body>
     </html>
   );
