@@ -7,7 +7,7 @@ This is an official imdbb web app
 Run the following command:
 
 ```sh
-cd omdb && npm ci
+cd omdb && npm install
 ```
 
 Once all of the dependencies have been installed, get your API key from [omdbapi](https://www.omdbapi.com).
